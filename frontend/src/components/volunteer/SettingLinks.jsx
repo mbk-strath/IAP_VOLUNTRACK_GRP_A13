@@ -5,16 +5,29 @@ function SettingLinks() {
   return (
     <div className="settingVolNav">
       <NavLink
-        to="/dashboard/settings"
+        to="/dashboard/volunteer/settings"
         end
-        className={({ isActive }) => (isActive ? "btn active" : "btn")}
+        className={({ isActive }) =>
+          isActive ? "btn-sett active" : "btn-sett"
+        }
       >
-        Profile
+        Personal Details
+      </NavLink>
+      <NavLink
+        to="/dashboard/volunteer/settings/other-details"
+        end
+        className={({ isActive }) =>
+          isActive ? "btn-sett active" : "btn-sett"
+        }
+      >
+        Other Details
       </NavLink>
 
       <NavLink
-        to="/dashboard/settings/account"
-        className={({ isActive }) => (isActive ? "btn active" : "btn")}
+        to="/dashboard/volunteer/settings/account"
+        className={({ isActive }) =>
+          isActive ? "btn-sett active" : "btn-sett"
+        }
       >
         Account
       </NavLink>

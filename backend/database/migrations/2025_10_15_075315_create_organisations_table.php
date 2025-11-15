@@ -14,20 +14,14 @@ return new class extends Migration
         Schema::create('organisations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('org_name');
-            $table->string('org_type');
-            $table->string('registration_number')->unique();
-            $table->string('email');
-            $table->string('phone');
+            $table->string('org_name')->nullable();
+            $table->string('org_type')->nullable();
+            $table->string('reg_no')->nullable()->unique();
             $table->string('website')->nullable();
             $table->string('logo')->nullable();
-            $table->string('country');
-            $table->string('city');
-            $table->string('street_address');
-            $table->string('operating_region');
-            $table->string('mission_statement')->nullable();
+            $table->string('country')->nullable();
+            $table->string('city')->nullable();
             $table->string('focus_area')->nullable();
-            $table->string('target_beneficiary')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

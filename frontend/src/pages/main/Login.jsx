@@ -3,6 +3,7 @@ import Logo from "../../assets/logo.png";
 import { FcGoogle } from "react-icons/fc";
 import "../../styles/main/login.css";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Login() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ function Login() {
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,7 +30,6 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
-
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -39,37 +40,47 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const res = await axios.post(
+        "http://localhost:8000/api/login",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
 
-      let data;
-      try {
-        data = await res.json(); // Try parsing JSON
-      } catch (jsonErr) {
-        throw new Error(
-          `Invalid JSON response from server. Status: ${res.status}`
-        );
-      }
-
+      const data = res.data;
       console.log("Login API response:", data);
 
-      if (!res.ok) {
-        // Show exact backend error or fallback
-        const backendMessage = data.message || JSON.stringify(data);
-        throw new Error(`Error ${res.status}: ${backendMessage}`);
+      if (data.user && data.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        const role = (data.user.role || "").trim().toLowerCase();
+        if (role === "admin") navigate("/dashboard/admin");
+        else if (role === "volunteer") navigate("/two-factor");
+        else if (role === "organisation" || role === "organization")
+          navigate("/two-factor");
+        else navigate("/");
+        return;
       }
 
-      // Save pending user for OTP flow
-      sessionStorage.setItem("pending_user", JSON.stringify(data.user));
+      if (data.message === "OTP sent to email") {
+        sessionStorage.setItem("otp_user_email", formData.email);
+        navigate("/two-factor");
+        return;
+      }
 
-      // Redirect to OTP page
-      navigate("/two-factor", { state: { email: formData.email } });
+      setApiError(data.message || "Login failed");
     } catch (err) {
-      console.error("Login error:", err);
-      setApiError(err.message); // Show exact error
+      console.error("Axios login error:", err);
+      if (err.response && err.response.data) {
+        setApiError(err.response.data.message || "Login failed");
+      } else {
+        setApiError("Server error. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -96,7 +107,7 @@ function Login() {
 
         <label htmlFor="password">Password</label>
         <input
-          type="password"
+          type={showPassword ? "text" : "password"}
           name="password"
           value={formData.password}
           id="password"
@@ -118,7 +129,15 @@ function Login() {
           <Link className="reset" to="/password-reset">
             Forgotten Password?
           </Link>
-          <Link className="show">Show Password</Link>
+
+          <button
+            type="button"
+            className="show"
+            onClick={() => setShowPassword(!showPassword)}
+            disabled={loading}
+          >
+            {showPassword ? "Hide Password" : "Show Password"}
+          </button>
         </div>
 
         <div className="or">

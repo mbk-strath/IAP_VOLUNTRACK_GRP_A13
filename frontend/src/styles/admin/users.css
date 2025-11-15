@@ -1,0 +1,179 @@
+.UsersPage {
+  padding-top: 5%;
+  color: #f1f5f9;
+  border-radius: 16px;
+  flex: 1;
+
+  min-height: 95vh;
+
+  padding-left: 2%;
+  overflow-x: hidden;
+}
+
+/* Title */
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: black;
+  margin-bottom: 32px;
+}
+
+/* Table container */
+.table-container {
+  overflow-x: auto;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  width: 90%;
+}
+
+/* Table */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: #020c19;
+}
+
+.org {
+  width: 73%;
+}
+
+.users-table th,
+.users-table td {
+  padding: 12px 18px;
+  white-space: nowrap;
+}
+
+.users-table th {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 12px;
+  color: #9ca3af;
+  border-bottom: 2px solid #334155;
+}
+
+.users-table tbody tr {
+  border-bottom: 1px solid #334155;
+  transition: background-color 0.2s ease;
+}
+
+.users-table tbody tr:hover {
+  background-color: #c9cbcf;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Action button */
+.action-btn {
+  background-color: #0e1420;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background-color 0.2s ease;
+}
+
+.action-btn:hover {
+  background-color: #1e40af;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .users-table th,
+  .users-table td {
+    padding: 14px 18px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .users-table {
+    font-size: 14px;
+  }
+
+  .users-table th,
+  .users-table td {
+    padding: 12px 14px;
+  }
+
+  .page-title {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .UsersPage {
+    padding: 16px;
+  }
+
+  .users-table {
+    font-size: 13px;
+  }
+
+  .users-table th,
+  .users-table td {
+    padding: 10px 12px;
+  }
+
+  .action-btn {
+    padding: 5px 8px;
+    font-size: 16px;
+  }
+}
+
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tabs-container {
+  display: flex;
+  padding: 10px;
+  gap: 15px;
+}
+.tab-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: #2e2e2e;
+  color: #1e40af;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+  background-color: #1e40af;
+  color: white;
+}
+
+.tab-btn.active {
+  border: 1px solid #1e40af;
+  color: black;
+  font-weight: 600;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

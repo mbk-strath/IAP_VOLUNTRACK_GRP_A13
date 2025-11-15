@@ -1,56 +1,67 @@
-import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import TwoFactorVerification from "../../components/main/TwoFactorVerification";
 import "../../styles/main/two-factor.css";
+import axios from "axios";
 
 const TwoFactorPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
-  const { email } = location.state || {}; // email passed from login
 
-  if (!email) {
-    navigate("/login");
-  }
+  const email = sessionStorage.getItem("otp_user_email");
+
+  useEffect(() => {
+    if (!email) {
+      navigate("/login");
+    }
+  }, [email, navigate]);
 
   const handleVerifyCode = async (code) => {
     setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          otp: code,
-        }),
+      if (!email) throw new Error("Missing email");
+
+      const res = await axios.post("http://127.0.0.1:8000/api/verify-otp", {
+        email,
+        otp: code,
       });
 
-      const data = await response.json();
+      const data = res.data;
+      console.log("OTP Verification response:", data);
 
-      if (response.ok) {
-        // Save user + token directly from backend response
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+      if (!data.user || !data.token) {
+        setError(data.message || "OTP verification failed");
+        return;
+      }
 
-        // Navigate based on role
-        if (data.user?.role === "volunteer") {
-          navigate("/dashboard");
-        } else if (data.user?.role === "student") {
-          navigate("/student-dashboard");
-        } else if (data.user?.role === "admin") {
-          navigate("/admin-dashboard");
-        } else {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      const role = (data.user.role || "").trim().toLowerCase();
+      switch (role) {
+        case "volunteer":
+          navigate("/dashboard/volunteer");
+          break;
+        case "organisation":
+        case "organization":
+          navigate("/dashboard/organization");
+          break;
+        case "admin":
+          navigate("/dashboard/admin");
+          break;
+        default:
           navigate("/login");
-        }
-      } else {
-        setError(data.message || "Invalid verification code");
       }
     } catch (err) {
-      setError("Network error. Please try again.");
-      console.error(err);
+      console.error("OTP verification error:", err);
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Network error. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -61,22 +72,22 @@ const TwoFactorPage = () => {
     setError("");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/resend-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+      if (!email) throw new Error("Missing email");
+
+      const res = await axios.post("http://127.0.0.1:8000/api/resend-otp", {
+        email,
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        return true;
-      } else {
-        setError(data.message || "Failed to resend code");
-        return false;
-      }
+      if (res.status === 200) return true;
+      setError(res.data.message || "Failed to resend code");
+      return false;
     } catch (err) {
-      setError("Network error. Please try again.");
+      console.error("Resend OTP error:", err);
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Network error. Please try again."
+      );
       return false;
     } finally {
       setIsLoading(false);

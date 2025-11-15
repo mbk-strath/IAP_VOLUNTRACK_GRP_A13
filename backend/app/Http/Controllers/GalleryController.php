@@ -14,17 +14,29 @@ use App\Models\Organisation;
 
 class GalleryController extends Controller
 {
-    public function listGalleries()
+    public function list()
     {
         $galleries = Gallery::all();
         return response()->json($galleries);
     }
+
     public function myGallery(Request $request, string $id)
     {
         $gallery = Gallery::where('org_id', $id)->get();
         return response()->json($gallery);
     }
-    public function addGallery(Request $request)
+
+    public function getImage($id)
+    {
+        $gallery = Gallery::find($id);
+        if (!$gallery) {
+            return response()->json(['message' => 'Gallery item not found'], 404);
+        }
+        return response()->json($gallery);
+    }
+
+
+    public function addImage(Request $request)
     {
         $request->validate([
             'org_id' => 'required|integer',
@@ -46,7 +58,9 @@ class GalleryController extends Controller
 
         return response()->json(['message' => 'Gallery item added successfully', 'gallery' => $gallery], 201);
     }
-    public function updateGallery(Request $request, string $id)
+
+
+    public function updateImage(Request $request, string $id)
     {
         $gallery = Gallery::find($id);
         if (!$gallery) {
@@ -73,7 +87,9 @@ class GalleryController extends Controller
 
         return response()->json(['message' => 'Gallery item updated successfully', 'gallery' => $gallery]);
     }
-    public function deleteGallery(Request $request, string $id)
+
+
+    public function deleteImage(Request $request, string $id)
     {
         $gallery = Gallery::find($id);
         if (!$gallery) {
